@@ -68,31 +68,40 @@
         </div>
     </footer>
 
-    <script>
-        $("#contactForm").submit(function (e) {
-            e.preventDefault();
+<script>
+  $(document).ready(function() {
+    $("#contactForm").submit(function(event) {
+      event.preventDefault();
+      
+      const formData = {
+        name: $("#name").val(),
+        email: $("#email").val(),
+        message: $("#message").val()
+      };
 
-            const data = {
-                name: $("#name").val(),
-                email: $("#email").val(),
-                message: $("#message").val(),
-            };
+      $.ajax({
+        type: "POST",
+        url: "https://9pfi98ldcj.execute-api.us-east-2.amazonaws.com/submitform",
+        data: JSON.stringify(formData),
+        contentType: "application/json",
+        dataType: "json"
+      })
+      .done(function(data) {
+        if (data && data.message === "Email sent successfully") {
+          alert("Thank you for your message! We'll get back to you soon.");
+          $("#contactForm")[0].reset();
+        } else {
+          alert("Sorry, there was an unexpected response. Please try again later.");
+        }
+      })
+      .fail(function(jqXHR, textStatus, errorThrown) {
+        console.error("Error: ", textStatus, ", ", errorThrown); // This logs more detailed error info to the console
+        alert("Sorry, there was an error sending your message. Please try again later.");
+      });
+    });
+  });
+</script>
 
-            $.ajax({
-                type: "POST",
-                url: "https://9pfi98ldcj.execute-api.us-east-2.amazonaws.com/submitform",
-                data: JSON.stringify(data),
-                contentType: "application/json",
-                success: function (response) {
-                    $("#responseMessage").text("Thank you! Your message has been sent.").css("color", "green");
-                    $("#contactForm")[0].reset();
-                },
-                error: function (response) {
-                    $("#responseMessage").text("Sorry, there was an error sending your message. Please try again later.").css("color", "red");
-                }
-            });
-        });
-    </script>
 
     <script src="assets/js/bootstrap.min.js"></script>
 </body>
